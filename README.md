@@ -1,6 +1,6 @@
 # tongflow-modal-ernie-image
 
-Official TongFlow plugin. Text-to-image generation with **ERNIE-Image** (`baidu/ERNIE-Image-Turbo` by default, `baidu/ERNIE-Image` for the full model), running on a GPU via [Modal](https://modal.com). An alternative to `tongflow-modal-z-image` on the same `image-gen` slot.
+Official [TongFlow](https://github.com/tong-io/tongflow) plugin. Text-to-image generation with **ERNIE-Image** (`baidu/ERNIE-Image-Turbo` by default, `baidu/ERNIE-Image` for the full model), running on a GPU via [Modal](https://modal.com). An alternative to `tongflow-modal-z-image` on the same `image-gen` slot.
 
 ## Capabilities
 
