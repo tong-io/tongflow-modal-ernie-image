@@ -1,4 +1,9 @@
 {
+    "plugin": {
+        "name": "ERNIE-Image",
+        "description": "Text-to-image generation with Baidu ERNIE-Image (Turbo by default).",
+        "icon": "/plugins/tongflow-modal-ernie-image.svg"
+    },
     "env": [
         {
             "key": "MODAL_TOKEN_ID",
