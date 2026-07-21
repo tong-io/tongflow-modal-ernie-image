@@ -55,7 +55,7 @@ image = (
     .apt_install("git")
     .pip_install(
         DIFFUSERS_GIT,
-        "tongflow==0.1.0",
+        "tongflow==0.2.13", "fastapi[standard]",
         "transformers==5.4.0",
         "safetensors==0.7.0",
         "loguru==0.7.3",
@@ -155,3 +155,18 @@ class Inference:
             seed=int(input.seed) if input.seed is not None else 42,
         )
         return ImageGenOutput(success=True, image=asset(raw, mime="image/png"))
+
+    @modal.fastapi_endpoint(method="GET", label=f"{Path(__file__).resolve().parent.name}-serve")
+    def serve(self, taskId: str = "", token: str = "", origin: str = ""):
+        from fastapi.responses import StreamingResponse
+        from tongflow import serve_stream_from_spec
+
+        return StreamingResponse(
+            serve_stream_from_spec(
+                origin, taskId, token, __file__,
+                invoke=lambda m, inp: getattr(self, m).local(inp),
+            ),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "Access-Control-Allow-Origin": "*"},
+        )
+
