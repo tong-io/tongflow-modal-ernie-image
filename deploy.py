@@ -55,7 +55,7 @@ image = (
     .apt_install("git")
     .pip_install(
         DIFFUSERS_GIT,
-        "tongflow==0.2.13", "fastapi[standard]",
+        "tongflow==0.2.16", "fastapi[standard]",
         "transformers==5.4.0",
         "safetensors==0.7.0",
         "loguru==0.7.3",
