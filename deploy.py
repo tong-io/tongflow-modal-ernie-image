@@ -24,7 +24,33 @@ from tongflow import deploy
 from tongflow.models.image_gen import ImageGenInput, ImageGenOutput
 from tongflow.node_slots import NodeSlots
 from tongflow.protocol import asset
-from tongflow.slots import node_slot
+from tongflow.slots import current_params, node_slot
+
+
+def _adv(name: str, default):
+    """Advanced-section override (``TONGFLOW_SLOT_PARAMS``) or the plugin default."""
+    v = current_params().get(name)
+    if v is None:
+        return default
+    if isinstance(default, bool):
+        return bool(v)
+    if isinstance(default, int):
+        return int(v)
+    if isinstance(default, float):
+        return float(v)
+    return v
+
+# Per-run knobs offered under the node's collapsed "Advanced" section.
+# Pure literal (the platform scanner reads it by AST, never imports this
+# module). Values reach the handlers via current_params(); an untouched
+# control is absent there and falls back to the plugin default.
+TONGFLOW_SLOT_PARAMS = {
+    "image-gen": {
+        "steps": {"type": "integer", "min": 1, "max": 60, "label": "Steps", "description": "Default 8 (Turbo) or 50 (base)."},
+        "guidance_scale": {"type": "number", "min": 0.0, "max": 10.0, "step": 0.5, "label": "Guidance scale", "description": "Default 1.0 (Turbo) or 4.0 (base)."},
+        "use_pe": {"type": "boolean", "default": True, "label": "Prompt enhancement"},
+    },
+}
 
 
 # Diffusers commit adding ERNIE-Image pipeline (see huggingface/diffusers#13432).
@@ -55,7 +81,7 @@ image = (
     .apt_install("git")
     .pip_install(
         DIFFUSERS_GIT,
-        "tongflow==0.2.21", "fastapi[standard]",
+        "tongflow==0.3.3", "fastapi[standard]",
         "transformers==5.4.0",
         "safetensors==0.7.0",
         "loguru==0.7.3",
@@ -144,14 +170,13 @@ class Inference:
         if not text:
             return ImageGenOutput(success=False, error="Missing text prompt")
 
-        # `use_pe` is plugin-specific and not part of the ABI; keep the default.
         raw = self._png_bytes(
             text,
             height=input.height if input.height is not None else 1024,
             width=input.width if input.width is not None else 1024,
-            num_inference_steps=DEFAULT_STEPS,
-            guidance_scale=DEFAULT_GUIDANCE,
-            use_pe=None,
+            num_inference_steps=_adv("steps", DEFAULT_STEPS),
+            guidance_scale=_adv("guidance_scale", DEFAULT_GUIDANCE),
+            use_pe=_adv("use_pe", DEFAULT_USE_PE),
             seed=int(input.seed) if input.seed is not None else 42,
         )
         return ImageGenOutput(success=True, image=asset(raw, mime="image/png"))
