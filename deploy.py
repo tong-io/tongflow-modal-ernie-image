@@ -46,8 +46,8 @@ def _adv(name: str, default):
 # control is absent there and falls back to the plugin default.
 TONGFLOW_SLOT_PARAMS = {
     "image-gen": {
-        "steps": {"type": "integer", "min": 1, "max": 60, "label": "Steps", "description": "Default 8 (Turbo) or 50 (base)."},
-        "guidance_scale": {"type": "number", "min": 0.0, "max": 10.0, "step": 0.5, "label": "Guidance scale", "description": "Default 1.0 (Turbo) or 4.0 (base)."},
+        "steps": {"type": "integer", "default": 8, "min": 1, "max": 60, "label": "Steps", "description": "8 for Turbo; use ~50 on the base checkpoint."},
+        "guidance_scale": {"type": "number", "default": 1.0, "min": 0.0, "max": 10.0, "step": 0.5, "label": "Guidance scale", "description": "1.0 for Turbo; use ~4.0 on the base checkpoint."},
         "use_pe": {"type": "boolean", "default": True, "label": "Prompt enhancement"},
     },
 }
